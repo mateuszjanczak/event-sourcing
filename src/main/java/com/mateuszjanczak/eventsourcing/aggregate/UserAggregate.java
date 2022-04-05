@@ -41,7 +41,7 @@ public class UserAggregate {
     }
 
     public void recreateUserState(List<Event> events) {
-        for(Event event: events) {
+        for (Event event : events) {
             switch (event.getEventType()) {
                 case UserCreatedEvent:
                     apply((UserCreatedEvent) event);

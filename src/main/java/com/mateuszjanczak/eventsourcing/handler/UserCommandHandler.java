@@ -5,12 +5,16 @@ import com.mateuszjanczak.eventsourcing.command.CreateUserCommand;
 import com.mateuszjanczak.eventsourcing.command.DisableUserCommand;
 import com.mateuszjanczak.eventsourcing.command.EnableUserCommand;
 import com.mateuszjanczak.eventsourcing.command.UpdateUserCommand;
+import com.mateuszjanczak.eventsourcing.event.Event;
 import com.mateuszjanczak.eventsourcing.event.UserCreatedEvent;
 import com.mateuszjanczak.eventsourcing.event.UserDisabledEvent;
 import com.mateuszjanczak.eventsourcing.event.UserEnabledEvent;
 import com.mateuszjanczak.eventsourcing.event.UserUpdatedEvent;
+import com.mateuszjanczak.eventsourcing.exception.UserNotFoundException;
 import com.mateuszjanczak.eventsourcing.store.UserEventStore;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserCommandHandler {
@@ -50,8 +54,10 @@ public class UserCommandHandler {
     }
 
     private UserAggregate getUser(String userId) {
+        List<Event> events = userEventStore.getEvents(userId);
+        if(events.size() == 0) throw new UserNotFoundException();
         UserAggregate userAggregate = new UserAggregate();
-        userAggregate.recreateUserState(userEventStore.getEvents(userId));
+        userAggregate.recreateUserState(events);
         return userAggregate;
     }
 }
